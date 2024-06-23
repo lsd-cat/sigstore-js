@@ -13,6 +13,9 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
+
+import { uint8ArrayToString } from '../encoding';
+
 const RE_TIME_SHORT_YEAR =
   /^(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})(\.\d{3})?Z$/;
 const RE_TIME_LONG_YEAR =
@@ -20,7 +23,7 @@ const RE_TIME_LONG_YEAR =
 
 // Parse a BigInt from the DER-encoded buffer
 // https://learn.microsoft.com/en-us/windows/win32/seccertenroll/about-integer
-export function parseInteger(buf: Buffer): bigint {
+export function parseInteger(buf: Uint8Array): bigint {
   let pos = 0;
   const end = buf.length;
   let val = buf[pos];
@@ -51,13 +54,13 @@ export function parseInteger(buf: Buffer): bigint {
 
 // Parse an ASCII string from the DER-encoded buffer
 // https://learn.microsoft.com/en-us/windows/win32/seccertenroll/about-basic-types#boolean
-export function parseStringASCII(buf: Buffer): string {
-  return buf.toString('ascii');
+export function parseStringASCII(buf: Uint8Array): string {
+  return uint8ArrayToString(buf);
 }
 
 // Parse a Date from the DER-encoded buffer
 // https://www.rfc-editor.org/rfc/rfc5280#section-4.1.2.5.1
-export function parseTime(buf: Buffer, shortYear: boolean): Date {
+export function parseTime(buf: Uint8Array, shortYear: boolean): Date {
   const timeStr = parseStringASCII(buf);
 
   // Parse the time string into matches - captured groups start at index 1
@@ -82,7 +85,7 @@ export function parseTime(buf: Buffer, shortYear: boolean): Date {
 
 // Parse an OID from the DER-encoded buffer
 // https://learn.microsoft.com/en-us/windows/win32/seccertenroll/about-object-identifier
-export function parseOID(buf: Buffer): string {
+export function parseOID(buf: Uint8Array): string {
   let pos = 0;
   const end = buf.length;
 
@@ -112,13 +115,13 @@ export function parseOID(buf: Buffer): string {
 
 // Parse a boolean from the DER-encoded buffer
 // https://learn.microsoft.com/en-us/windows/win32/seccertenroll/about-basic-types#boolean
-export function parseBoolean(buf: Buffer): boolean {
+export function parseBoolean(buf: Uint8Array): boolean {
   return buf[0] !== 0;
 }
 
 // Parse a bit string from the DER-encoded buffer
 // https://learn.microsoft.com/en-us/windows/win32/seccertenroll/about-bit-string
-export function parseBitString(buf: Buffer): number[] {
+export function parseBitString(buf: Uint8Array): number[] {
   // First byte tell us how many unused bits are in the last byte
   const unused = buf[0];
 

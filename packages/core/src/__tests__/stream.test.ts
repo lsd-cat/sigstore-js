@@ -16,7 +16,7 @@ limitations under the License.
 import { ByteStream } from '../stream';
 
 describe('ByteStream', () => {
-  const buf = Buffer.from([
+  const buf = new Uint8Array([
     0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09,
   ]);
   const subject = new ByteStream(buf);
@@ -120,7 +120,7 @@ describe('ByteStream', () => {
 
     it('appends a character to the buffer', () => {
       subject.appendChar(0x0a);
-      expect(subject.buffer).toEqual(Buffer.from([0x0a]));
+      expect(subject.buffer).toEqual(new Uint8Array([0x0a]));
       expect(subject.position).toEqual(1);
     });
   });
@@ -130,7 +130,7 @@ describe('ByteStream', () => {
 
     it('appends a uint16 to the buffer', () => {
       subject.appendUint16(0x0a0b);
-      expect(subject.buffer).toEqual(Buffer.from([0x0a, 0x0b]));
+      expect(subject.buffer).toEqual(new Uint8Array([0x0a, 0x0b]));
       expect(subject.position).toEqual(2);
     });
   });
@@ -140,7 +140,7 @@ describe('ByteStream', () => {
 
     it('appends a uint24 to the buffer', () => {
       subject.appendUint24(0x0a0b0c);
-      expect(subject.buffer).toEqual(Buffer.from([0x0a, 0x0b, 0x0c]));
+      expect(subject.buffer).toEqual(new Uint8Array([0x0a, 0x0b, 0x0c]));
       expect(subject.position).toEqual(3);
     });
   });
@@ -158,7 +158,7 @@ describe('ByteStream', () => {
       const viewSize = 9999;
 
       it('allocates the necessary space and appends the view to the buffer', () => {
-        subject.appendView(Buffer.alloc(viewSize));
+        subject.appendView(new Uint8Array(viewSize));
         expect(subject.position).toEqual(buf.length + viewSize);
       });
     });

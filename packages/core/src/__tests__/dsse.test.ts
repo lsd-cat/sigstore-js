@@ -14,13 +14,14 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 import { preAuthEncoding } from '../dsse';
+import { stringToUint8Array } from '../encoding';
 
 describe('preAuthEncoding', () => {
   const payloadType = 'text/plain';
-  const payload = Buffer.from('Hello, World!', 'utf8');
+  const payload = stringToUint8Array('Hello, World!', 'utf8');
 
   it('should return the correct pre-auth encoding', () => {
     const pae = preAuthEncoding(payloadType, payload);
-    expect(pae).toEqual(Buffer.from('DSSEv1 10 text/plain 13 Hello, World!'));
+    expect(pae).toEqual(stringToUint8Array('DSSEv1 10 text/plain 13 Hello, World!'));
   });
 });

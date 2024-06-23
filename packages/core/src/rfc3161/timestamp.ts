@@ -30,7 +30,7 @@ export class RFC3161Timestamp {
     this.root = asn1;
   }
 
-  public static parse(der: Buffer): RFC3161Timestamp {
+  public static parse(der: Uint8Array): RFC3161Timestamp {
     const asn1 = ASN1Obj.parseBuffer(der);
     return new RFC3161Timestamp(asn1);
   }
@@ -51,11 +51,11 @@ export class RFC3161Timestamp {
     return this.tstInfo.genTime;
   }
 
-  get signerIssuer(): Buffer {
+  get signerIssuer(): Uint8Array {
     return this.signerSidObj.subs[0].value;
   }
 
-  get signerSerialNumber(): Buffer {
+  get signerSerialNumber(): Uint8Array {
     return this.signerSidObj.subs[1].value;
   }
 
@@ -69,7 +69,7 @@ export class RFC3161Timestamp {
     return ECDSA_SIGNATURE_ALGOS[oid];
   }
 
-  get signatureValue(): Buffer {
+  get signatureValue(): Uint8Array {
     return this.signatureValueObj.value;
   }
 
@@ -78,7 +78,7 @@ export class RFC3161Timestamp {
     return new TSTInfo(this.eContentObj.subs[0].subs[0]);
   }
 
-  public verify(data: Buffer, publicKey: crypto.KeyObject): void {
+  public verify(data: Uint8Array, publicKey: crypto.KeyObject): void {
     if (!this.timeStampTokenObj) {
       throw new RFC3161TimestampVerificationError('timeStampToken is missing');
     }

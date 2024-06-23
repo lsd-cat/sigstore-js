@@ -19,17 +19,19 @@ export type { KeyObject } from 'crypto';
 const SHA256_ALGORITHM = 'sha256';
 
 export function createPublicKey(
-  key: string | Buffer,
+  keyValue: string | Uint8Array,
   type: 'spki' | 'pkcs1' = 'spki'
 ): crypto.KeyObject {
-  if (typeof key === 'string') {
+  if (typeof keyValue === 'string') {
+    const key = keyValue;
     return crypto.createPublicKey(key);
   } else {
+    const key = Buffer.from(keyValue);
     return crypto.createPublicKey({ key, format: 'der', type: type });
   }
 }
 
-export function digest(algorithm: string, ...data: BinaryLike[]): Buffer {
+export function digest(algorithm: string, ...data: BinaryLike[]): Uint8Array {
   const hash = crypto.createHash(algorithm);
   for (const d of data) {
     hash.update(d);
@@ -38,7 +40,7 @@ export function digest(algorithm: string, ...data: BinaryLike[]): Buffer {
 }
 
 // TODO: deprecate this in favor of digest()
-export function hash(...data: BinaryLike[]): Buffer {
+export function hash(...data: BinaryLike[]): Uint8Array {
   const hash = crypto.createHash(SHA256_ALGORITHM);
   for (const d of data) {
     hash.update(d);
@@ -47,9 +49,9 @@ export function hash(...data: BinaryLike[]): Buffer {
 }
 
 export function verify(
-  data: Buffer,
+  data: Uint8Array,
   key: crypto.KeyLike,
-  signature: Buffer,
+  signature: Uint8Array,
   algorithm?: string
 ): boolean {
   // The try/catch is to work around an issue in Node 14.x where verify throws
@@ -62,7 +64,7 @@ export function verify(
   }
 }
 
-export function bufferEqual(a: Buffer, b: Buffer): boolean {
+export function bufferEqual(a: Uint8Array, b: Uint8Array): boolean {
   try {
     return crypto.timingSafeEqual(a, b);
   } catch {

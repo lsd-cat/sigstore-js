@@ -21,26 +21,27 @@ import {
   parseStringASCII,
   parseTime,
 } from '../../asn1/parse';
+import { hexToUint8Array, stringToUint8Array } from '../../encoding';
 
 describe('parseInteger', () => {
   it('parses positive integers', () => {
-    expect(parseInteger(Buffer.from([0x00]))).toEqual(BigInt(0));
-    expect(parseInteger(Buffer.from([0x7f]))).toEqual(BigInt(127));
-    expect(parseInteger(Buffer.from([0x00, 0x80]))).toEqual(BigInt(128));
-    expect(parseInteger(Buffer.from([0x01, 0x00]))).toEqual(BigInt(256));
+    expect(parseInteger(new Uint8Array([0x00]))).toEqual(BigInt(0));
+    expect(parseInteger(new Uint8Array([0x7f]))).toEqual(BigInt(127));
+    expect(parseInteger(new Uint8Array([0x00, 0x80]))).toEqual(BigInt(128));
+    expect(parseInteger(new Uint8Array([0x01, 0x00]))).toEqual(BigInt(256));
   });
 
   it('parses negative integers', () => {
-    expect(parseInteger(Buffer.from([0xff]))).toEqual(BigInt(-1));
-    expect(parseInteger(Buffer.from([0x80]))).toEqual(BigInt(-128));
-    expect(parseInteger(Buffer.from([0xff, 0x7f]))).toEqual(BigInt(-129));
-    expect(parseInteger(Buffer.from([0xff, 0x00]))).toEqual(BigInt(-256));
+    expect(parseInteger(new Uint8Array([0xff]))).toEqual(BigInt(-1));
+    expect(parseInteger(new Uint8Array([0x80]))).toEqual(BigInt(-128));
+    expect(parseInteger(new Uint8Array([0xff, 0x7f]))).toEqual(BigInt(-129));
+    expect(parseInteger(new Uint8Array([0xff, 0x00]))).toEqual(BigInt(-256));
   });
 });
 
 describe('parseStringASCII', () => {
   it('parses ASCII strings', () => {
-    expect(parseStringASCII(Buffer.from([0x48, 0x69, 0x21]))).toEqual('Hi!');
+    expect(parseStringASCII(new Uint8Array([0x48, 0x69, 0x21]))).toEqual('Hi!');
   });
 });
 
@@ -48,7 +49,7 @@ describe('parseTime', () => {
   describe('with short year', () => {
     describe('when year is 50 or greater', () => {
       it('parses the date', () => {
-        expect(parseTime(Buffer.from('740212121110Z'), true)).toEqual(
+        expect(parseTime(stringToUint8Array('740212121110Z'), true)).toEqual(
           new Date('1974-02-12T12:11:10Z')
         );
       });
@@ -56,7 +57,7 @@ describe('parseTime', () => {
 
     describe('when year is less than 50', () => {
       it('parses the date', () => {
-        expect(parseTime(Buffer.from('180212121110.099Z'), true)).toEqual(
+        expect(parseTime(stringToUint8Array('180212121110.099Z'), true)).toEqual(
           new Date('2018-02-12T12:11:10Z')
         );
       });
@@ -65,7 +66,7 @@ describe('parseTime', () => {
 
   describe('with long year', () => {
     it('parses the date', () => {
-      expect(parseTime(Buffer.from('19180212121110Z'), false)).toEqual(
+      expect(parseTime(stringToUint8Array('19180212121110Z'), false)).toEqual(
         new Date('1918-02-12T12:11:10Z')
       );
     });
@@ -73,7 +74,7 @@ describe('parseTime', () => {
 
   describe('with long year and milliseconds', () => {
     it('parses the date', () => {
-      expect(parseTime(Buffer.from('19180212121110.099Z'), false)).toEqual(
+      expect(parseTime(stringToUint8Array('19180212121110.099Z'), false)).toEqual(
         new Date('1918-02-12T12:11:10Z')
       );
     });
@@ -81,7 +82,7 @@ describe('parseTime', () => {
 
   describe('when the time is invalid', () => {
     it('throws an error', () => {
-      expect(() => parseTime(Buffer.from('FOOBAR'), true)).toThrow(
+      expect(() => parseTime(stringToUint8Array('FOOBAR'), true)).toThrow(
         'invalid time'
       );
     });
@@ -118,27 +119,27 @@ describe('parseOID', () => {
 
   it('parses OID strings', () => {
     tests.forEach(({ oid, expected }) => {
-      expect(parseOID(Buffer.from(oid, 'hex'))).toEqual(expected);
+      expect(parseOID(hexToUint8Array(oid))).toEqual(expected);
     });
   });
 });
 
 describe('parseBoolean', () => {
   it('parses boolean values', () => {
-    expect(parseBoolean(Buffer.from([0x00]))).toEqual(false);
-    expect(parseBoolean(Buffer.from([0xff]))).toEqual(true);
+    expect(parseBoolean(new Uint8Array([0x00]))).toEqual(false);
+    expect(parseBoolean(new Uint8Array([0xff]))).toEqual(true);
   });
 });
 
 describe('parseBitString', () => {
   it('parses bit strings', () => {
-    expect(parseBitString(Buffer.from([0x04, 0x57, 0xd0]))).toEqual([
+    expect(parseBitString(new Uint8Array([0x04, 0x57, 0xd0]))).toEqual([
       0, 1, 0, 1, 0, 1, 1, 1, 1, 1, 0, 1,
     ]);
 
     // Since the last four bits are ignored, the parsed bit string is
     // identical to the example above.
-    expect(parseBitString(Buffer.from([0x04, 0x57, 0xdf]))).toEqual([
+    expect(parseBitString(new Uint8Array([0x04, 0x57, 0xdf]))).toEqual([
       0, 1, 0, 1, 0, 1, 1, 1, 1, 1, 0, 1,
     ]);
   });

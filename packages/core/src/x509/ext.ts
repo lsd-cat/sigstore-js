@@ -16,6 +16,7 @@ limitations under the License.
 import { ASN1Obj } from '../asn1';
 import { ByteStream } from '../stream';
 import { SignedCertificateTimestamp } from './sct';
+import { uint8ArrayToString } from '../encoding';
 
 // https://www.rfc-editor.org/rfc/rfc5280#section-4.1
 export class X509Extension {
@@ -35,7 +36,7 @@ export class X509Extension {
     return this.root.subs.length === 3 ? this.root.subs[1].toBoolean() : false;
   }
 
-  get value(): Buffer {
+  get value(): Uint8Array {
     return this.extnValueObj.value;
   }
 
@@ -92,11 +93,11 @@ export class X509KeyUsageExtension extends X509Extension {
 // https://www.rfc-editor.org/rfc/rfc5280#section-4.2.1.6
 export class X509SubjectAlternativeNameExtension extends X509Extension {
   get rfc822Name(): string | undefined {
-    return this.findGeneralName(0x01)?.value.toString('ascii');
+    return uint8ArrayToString(this.findGeneralName(0x01)?.value);
   }
 
   get uri(): string | undefined {
-    return this.findGeneralName(0x06)?.value.toString('ascii');
+    return uint8ArrayToString(this.findGeneralName(0x06)?.value);
   }
 
   // Retrieve the value of an otherName with the given OID.
@@ -116,7 +117,7 @@ export class X509SubjectAlternativeNameExtension extends X509Extension {
 
     // The otherNameValue is a sequence containing the actual value.
     const otherNameValue = otherName.subs[1];
-    return otherNameValue.subs[0].value.toString('ascii');
+    return uint8ArrayToString(otherNameValue.subs[0].value);
   }
 
   private findGeneralName(tag: number): ASN1Obj | undefined {
@@ -131,7 +132,7 @@ export class X509SubjectAlternativeNameExtension extends X509Extension {
 
 // https://www.rfc-editor.org/rfc/rfc5280#section-4.2.1.1
 export class X509AuthorityKeyIDExtension extends X509Extension {
-  get keyIdentifier(): Buffer | undefined {
+  get keyIdentifier(): Uint8Array | undefined {
     return this.findSequenceMember(0x00)?.value;
   }
 
@@ -147,7 +148,7 @@ export class X509AuthorityKeyIDExtension extends X509Extension {
 
 // https://www.rfc-editor.org/rfc/rfc5280#section-4.2.1.2
 export class X509SubjectKeyIDExtension extends X509Extension {
-  get keyIdentifier(): Buffer {
+  get keyIdentifier(): Uint8Array {
     return this.extnValueObj.subs[0].value;
   }
 }

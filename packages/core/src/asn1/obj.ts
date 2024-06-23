@@ -28,20 +28,20 @@ import { ASN1Tag } from './tag';
 export class ASN1Obj {
   readonly tag: ASN1Tag;
   readonly subs: ASN1Obj[];
-  readonly value: Buffer;
+  readonly value: Uint8Array;
 
-  constructor(tag: ASN1Tag, value: Buffer, subs: ASN1Obj[]) {
+  constructor(tag: ASN1Tag, value: Uint8Array, subs: ASN1Obj[]) {
     this.tag = tag;
     this.value = value;
     this.subs = subs;
   }
 
   // Constructs an ASN.1 object from a Buffer of DER-encoded bytes.
-  public static parseBuffer(buf: Buffer): ASN1Obj {
+  public static parseBuffer(buf: Uint8Array): ASN1Obj {
     return parseStream(new ByteStream(buf));
   }
 
-  public toDER(): Buffer {
+  public toDER(): Uint8Array {
     const valueStream = new ByteStream();
 
     if (this.subs.length > 0) {

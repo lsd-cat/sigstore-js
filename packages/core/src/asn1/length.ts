@@ -52,9 +52,9 @@ export function decodeLength(stream: ByteStream): number {
 }
 
 // Translates the supplied value to a DER-encoded length.
-export function encodeLength(len: number): Buffer {
+export function encodeLength(len: number): Uint8Array {
   if (len < 128) {
-    return Buffer.from([len]);
+    return new Uint8Array([len]);
   }
 
   // Bitwise operations on large numbers are not supported in JS, so we need to
@@ -67,5 +67,5 @@ export function encodeLength(len: number): Buffer {
     val = val >> 8n;
   }
 
-  return Buffer.from([0x80 | bytes.length, ...bytes]);
+  return new Uint8Array([0x80 | bytes.length, ...bytes]);
 }

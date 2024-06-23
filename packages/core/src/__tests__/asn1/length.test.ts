@@ -62,31 +62,31 @@ describe('decodeLength', () => {
 describe('encodeLength', () => {
   describe('when the length is less than 128', () => {
     it('returns the encoded length', () => {
-      expect(encodeLength(16)).toEqual(Buffer.from([0x10]));
+      expect(encodeLength(16)).toEqual(new Uint8Array([0x10]));
     });
   });
 
   describe('when the length is equal to 128', () => {
     it('returns the encoded length', () => {
-      expect(encodeLength(128)).toEqual(Buffer.from([0x81, 0x80]));
+      expect(encodeLength(128)).toEqual(new Uint8Array([0x81, 0x80]));
     });
   });
 
   describe('when the length is greater than 128', () => {
     it('returns the encoded length', () => {
-      expect(encodeLength(256)).toEqual(Buffer.from([0x82, 0x01, 0x00]));
+      expect(encodeLength(256)).toEqual(new Uint8Array([0x82, 0x01, 0x00]));
     });
   });
 
   describe('when the length is the max value', () => {
     it('returns the encoded length', () => {
       expect(encodeLength(281474976710655)).toEqual(
-        Buffer.from([0x86, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff])
+        new Uint8Array([0x86, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff])
       );
     });
   });
 });
 
 function streamFromBytes(bytes: number[]): ByteStream {
-  return new ByteStream(Buffer.from(bytes));
+  return new ByteStream(new Uint8Array(bytes));
 }

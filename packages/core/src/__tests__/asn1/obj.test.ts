@@ -15,19 +15,20 @@ limitations under the License.
 */
 import { ASN1TypeError } from '../../asn1/error';
 import { ASN1Obj } from '../../asn1/obj';
+import { uint8ArrayToHex, hexToUint8Array } from '../../encoding';
 
 describe('ASN1Obj', () => {
   describe('parseBuffer', () => {
     describe('when parsing a primitive', () => {
       // INTEGER (2 bytes) 0x1010
-      const buffer = Buffer.from('02021010', 'hex');
+      const buffer = hexToUint8Array('02021010');
 
       it('parses a primitive', () => {
         const obj = ASN1Obj.parseBuffer(buffer);
 
         expect(obj).toBeInstanceOf(ASN1Obj);
         expect(obj.tag.number).toBe(2);
-        expect(obj.value.toString('hex')).toBe('1010');
+        expect(uint8ArrayToHex(obj.value)).toBe('1010');
         expect(obj.subs).toHaveLength(0);
 
         expect(obj.toDER()).toEqual(buffer);
@@ -38,24 +39,24 @@ describe('ASN1Obj', () => {
       // SEQUENCE (8 bytes)
       //   INTEGER (2 bytes) 0x1010
       //   INTEGER (2 bytes) 0x1111
-      const buffer = Buffer.from('30080202101002021111', 'hex');
+      const buffer = hexToUint8Array('30080202101002021111');
       it('parses a constructed object', () => {
         const obj = ASN1Obj.parseBuffer(buffer);
 
         expect(obj).toBeInstanceOf(ASN1Obj);
         expect(obj.tag.constructed).toBe(true);
         expect(obj.tag.number).toBe(16);
-        expect(obj.value.toString('hex')).toBe('0202101002021111');
+        expect(uint8ArrayToHex(obj.value)).toBe('0202101002021111');
         expect(obj.subs).toHaveLength(2);
 
         expect(obj.subs[0].tag.constructed).toBe(false);
         expect(obj.subs[0].tag.number).toBe(2);
-        expect(obj.subs[0].value.toString('hex')).toBe('1010');
+        expect(uint8ArrayToHex(obj.subs[0].value)).toBe('1010');
         expect(obj.subs[0].subs).toHaveLength(0);
 
         expect(obj.subs[1].tag.constructed).toBe(false);
         expect(obj.subs[1].tag.number).toBe(2);
-        expect(obj.subs[1].value.toString('hex')).toBe('1111');
+        expect(uint8ArrayToHex(obj.subs[1].value)).toBe('1111');
         expect(obj.subs[1].subs).toHaveLength(0);
       });
     });
@@ -64,24 +65,24 @@ describe('ASN1Obj', () => {
       // OCTET STRING (8 bytes)
       //   INTEGER (2 bytes) 0x1010
       //   INTEGER (2 bytes) 0x1010
-      const buffer = Buffer.from('04080202101002021111', 'hex');
+      const buffer = hexToUint8Array('04080202101002021111');
       it('parses the object', () => {
         const obj = ASN1Obj.parseBuffer(buffer);
 
         expect(obj).toBeInstanceOf(ASN1Obj);
         expect(obj.tag.constructed).toBe(false);
         expect(obj.tag.number).toBe(0x04);
-        expect(obj.value.toString('hex')).toBe('0202101002021111');
+        expect(uint8ArrayToHex(obj.value)).toBe('0202101002021111');
         expect(obj.subs).toHaveLength(2);
 
         expect(obj.subs[0].tag.constructed).toBe(false);
         expect(obj.subs[0].tag.number).toBe(2);
-        expect(obj.subs[0].value.toString('hex')).toBe('1010');
+        expect(uint8ArrayToHex(obj.subs[0].value)).toBe('1010');
         expect(obj.subs[0].subs).toHaveLength(0);
 
         expect(obj.subs[1].tag.constructed).toBe(false);
         expect(obj.subs[1].tag.number).toBe(2);
-        expect(obj.subs[1].value.toString('hex')).toBe('1111');
+        expect(uint8ArrayToHex(obj.subs[1].value)).toBe('1111');
         expect(obj.subs[1].subs).toHaveLength(0);
       });
     });
@@ -90,14 +91,14 @@ describe('ASN1Obj', () => {
       describe('when the OCTET STREAM value almost looks like an embedded obj', () => {
         // OCTET STREAM looks like it could have a nested OCTET STREAM, but it
         // doesn't -- the length of the nested OCTET STREAM is too long.
-        const buffer = Buffer.from('04020408', 'hex');
+        const buffer = hexToUint8Array('04020408');
         it('parses the OCTET STREAM as a primitive', () => {
           const obj = ASN1Obj.parseBuffer(buffer);
 
           expect(obj).toBeInstanceOf(ASN1Obj);
           expect(obj.tag.constructed).toBe(false);
           expect(obj.tag.number).toBe(0x04);
-          expect(obj.value.toString('hex')).toBe('0408');
+          expect(uint8ArrayToHex(obj.value)).toBe('0408');
           expect(obj.subs).toHaveLength(0);
         });
       });
@@ -105,14 +106,14 @@ describe('ASN1Obj', () => {
       describe('when the OCTET STREAM value almost looks like an embedded obj', () => {
         // OCTET STREAM looks like it could have a nested OCTET STREAM, but it
         // doesn't -- the length of the nested OCTET STREAM is too short.
-        const buffer = Buffer.from('0406040213013131', 'hex');
+        const buffer = hexToUint8Array('0406040213013131');
         it('parses the OCTET STREAM as a primitive', () => {
           const obj = ASN1Obj.parseBuffer(buffer);
 
           expect(obj).toBeInstanceOf(ASN1Obj);
           expect(obj.tag.constructed).toBe(false);
           expect(obj.tag.number).toBe(0x04);
-          expect(obj.value.toString('hex')).toBe('040213013131');
+          expect(uint8ArrayToHex(obj.value)).toBe('040213013131');
           expect(obj.subs).toHaveLength(0);
         });
       });
@@ -122,7 +123,7 @@ describe('ASN1Obj', () => {
   describe('#toDER', () => {
     describe('when the object is a primitive', () => {
       // INTEGER (2 bytes) 0x1010
-      const buffer = Buffer.from('02021010', 'hex');
+      const buffer = hexToUint8Array('02021010');
       const obj = ASN1Obj.parseBuffer(buffer);
 
       it('encodes properly', () => {
@@ -134,7 +135,7 @@ describe('ASN1Obj', () => {
       // SEQUENCE (8 bytes)
       //   INTEGER (2 bytes) 0x1010
       //   INTEGER (2 bytes) 0x1111
-      const buffer = Buffer.from('30080202101002021111', 'hex');
+      const buffer = hexToUint8Array('30080202101002021111');
       const obj = ASN1Obj.parseBuffer(buffer);
 
       it('encodes properly', () => {
@@ -146,7 +147,7 @@ describe('ASN1Obj', () => {
 
         it('encodes properly', () => {
           obj.subs.splice(0, 1);
-          expect(obj.toDER()).toStrictEqual(Buffer.from('300402021111', 'hex'));
+          expect(obj.toDER()).toStrictEqual(hexToUint8Array('300402021111'));
         });
       });
     });
@@ -156,7 +157,7 @@ describe('ASN1Obj', () => {
     describe('when the object is a BOOLEAN', () => {
       describe('when the value is 0x00', () => {
         // BOOLEAN (1 byte) 0x00
-        const buffer = Buffer.from('010100', 'hex');
+        const buffer = hexToUint8Array('010100');
         it('returns false', () => {
           const obj = ASN1Obj.parseBuffer(buffer);
           expect(obj.toBoolean()).toBe(false);
@@ -165,7 +166,7 @@ describe('ASN1Obj', () => {
 
       describe('when the value is 0x01', () => {
         // BOOLEAN (1 byte) 0x01
-        const buffer = Buffer.from('010101', 'hex');
+        const buffer = hexToUint8Array('010101');
         it('returns true', () => {
           const obj = ASN1Obj.parseBuffer(buffer);
           expect(obj.toBoolean()).toBe(true);
@@ -174,7 +175,7 @@ describe('ASN1Obj', () => {
     });
 
     describe('when the object is not a BOOLEAN', () => {
-      const buffer = Buffer.from('810102', 'hex');
+      const buffer = hexToUint8Array('810102');
       it('throws an error', () => {
         const obj = ASN1Obj.parseBuffer(buffer);
         expect(() => obj.toBoolean()).toThrow(ASN1TypeError);
@@ -185,7 +186,7 @@ describe('ASN1Obj', () => {
   describe('#toInteger', () => {
     describe('when the object is an INTEGER', () => {
       // INTEGER (1 bytes) 0x00
-      const buffer = Buffer.from('020100', 'hex');
+      const buffer = hexToUint8Array('020100');
       it('returns the parsed integer', () => {
         const obj = ASN1Obj.parseBuffer(buffer);
         expect(obj.toInteger()).toBe(BigInt(0));
@@ -193,7 +194,7 @@ describe('ASN1Obj', () => {
     });
 
     describe('when the object is NOT an INTEGER', () => {
-      const buffer = Buffer.from('820100', 'hex');
+      const buffer = hexToUint8Array('820100');
       it('throws an error', () => {
         const obj = ASN1Obj.parseBuffer(buffer);
         expect(() => obj.toInteger()).toThrow(ASN1TypeError);
@@ -204,7 +205,7 @@ describe('ASN1Obj', () => {
   describe('#toOID', () => {
     describe('when the object is an OBJECT IDENTIFIER', () => {
       // OBJECT IDENTIFIER (1 byte) 0x82
-      const buffer = Buffer.from('060182', 'hex');
+      const buffer = hexToUint8Array('060182');
       it('returns parsed OID', () => {
         const obj = ASN1Obj.parseBuffer(buffer);
         expect(obj.toOID()).toBe('3.10');
@@ -212,7 +213,7 @@ describe('ASN1Obj', () => {
     });
 
     describe('when the object is NOT an OBJECT IDENTIFIER', () => {
-      const buffer = Buffer.from('020100', 'hex');
+      const buffer = hexToUint8Array('020100');
       it('throws an error', () => {
         const obj = ASN1Obj.parseBuffer(buffer);
         expect(() => obj.toOID()).toThrow(ASN1TypeError);
@@ -223,7 +224,7 @@ describe('ASN1Obj', () => {
   describe('#toDate', () => {
     describe('when the object is a UTCTime', () => {
       // UTCTime (13 bytes) 0x3232313132323131313131315A
-      const buffer = Buffer.from('170D3232313132323131313131315A', 'hex');
+      const buffer = hexToUint8Array('170D3232313132323131313131315A');
       it('returns the parsed date', () => {
         const obj = ASN1Obj.parseBuffer(buffer);
         expect(obj.toDate().toISOString()).toBe('2022-11-22T11:11:11.000Z');
@@ -232,7 +233,7 @@ describe('ASN1Obj', () => {
 
     describe('when the object is a GeneralizedTime', () => {
       // GeneralizedTime (15 bytes) 0x32303232313132323131313131315A
-      const buffer = Buffer.from('180F32303232313132323131313131315A', 'hex');
+      const buffer = hexToUint8Array('180F32303232313132323131313131315A');
       it('returns the parsed date', () => {
         const obj = ASN1Obj.parseBuffer(buffer);
         expect(obj.toDate().toISOString()).toBe('2022-11-22T11:11:11.000Z');
@@ -240,7 +241,7 @@ describe('ASN1Obj', () => {
     });
 
     describe('when the object is NOT an UTCTime or GeneralizedTime', () => {
-      const buffer = Buffer.from('020100', 'hex');
+      const buffer = hexToUint8Array('020100');
       it('throws an error', () => {
         const obj = ASN1Obj.parseBuffer(buffer);
         expect(() => obj.toDate()).toThrow(ASN1TypeError);
@@ -251,7 +252,7 @@ describe('ASN1Obj', () => {
   describe('#toBitString', () => {
     describe('when the object is a BITSTRING', () => {
       // BITSTRING (2 bytes) 0x00F0
-      const buffer = Buffer.from('030200F0', 'hex');
+      const buffer = hexToUint8Array('030200F0');
       it('returns the parsed bit string', () => {
         const obj = ASN1Obj.parseBuffer(buffer);
         expect(obj.toBitString()).toEqual([1, 1, 1, 1, 0, 0, 0, 0]);
@@ -259,7 +260,7 @@ describe('ASN1Obj', () => {
     });
 
     describe('when the object is NOT a BITSTRING', () => {
-      const buffer = Buffer.from('020100', 'hex');
+      const buffer = hexToUint8Array('020100');
       it('throws an error', () => {
         const obj = ASN1Obj.parseBuffer(buffer);
         expect(() => obj.toBitString()).toThrow(ASN1TypeError);

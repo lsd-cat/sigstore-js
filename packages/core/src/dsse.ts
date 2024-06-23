@@ -16,7 +16,7 @@ limitations under the License.
 const PAE_PREFIX = 'DSSEv1';
 
 // DSSE Pre-Authentication Encoding
-export function preAuthEncoding(payloadType: string, payload: Buffer): Buffer {
+export function preAuthEncoding(payloadType: string, payload: Uint8Array): Uint8Array {
   const prefix = [
     PAE_PREFIX,
     payloadType.length,
@@ -25,5 +25,14 @@ export function preAuthEncoding(payloadType: string, payload: Buffer): Buffer {
     '',
   ].join(' ');
 
-  return Buffer.concat([Buffer.from(prefix, 'ascii'), payload]);
+  // Is using utf-8 a problem? I don't think so but adding this warning
+  const encoder = new TextEncoder();
+  const prefixBuffer = encoder.encode(prefix)
+
+  // Badic Uint8Array concat
+  const combinedArray = new Uint8Array(prefixBuffer.length + payload.length);
+
+  combinedArray.set(prefixBuffer, 0);
+  combinedArray.set(payload, prefixBuffer.length);
+  return combinedArray;
 }

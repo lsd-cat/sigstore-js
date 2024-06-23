@@ -15,6 +15,7 @@ limitations under the License.
 */
 import { X509Certificate } from '../../x509/cert';
 import { certificates } from '../__fixtures__/certs';
+import { base64ToUint8Array, hexToUint8Array } from '../../encoding';
 
 describe('X509Certificate', () => {
   describe('.parse', () => {
@@ -24,7 +25,7 @@ describe('X509Certificate', () => {
 
         expect(cert.version).toBe('v3');
         expect(cert.serialNumber).toEqual(
-          Buffer.from('61CC29EC72F2E28458A0C330B7E8D40357FAFE9E', 'hex')
+          hexToUint8Array('61CC29EC72F2E28458A0C330B7E8D40357FAFE9E')
         );
         expect(cert.notBefore).toBeInstanceOf(Date);
         expect(cert.notBefore.toISOString()).toBe('1990-01-01T00:00:00.000Z');

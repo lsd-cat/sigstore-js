@@ -16,11 +16,11 @@ limitations under the License.
 import { ASN1Obj } from '../../asn1';
 import { RFC3161TimestampVerificationError } from '../../rfc3161/error';
 import { TSTInfo } from '../../rfc3161/tstinfo';
+import { hexToUint8Array, stringToUint8Array } from '../../encoding';
 
 describe('TSTInfo', () => {
-  const tstInfoDER = Buffer.from(
-    '3081a602010106092b0601040183bf30023031300d060960864801650304020105000420853ff93762a06ddbf722c4ebe9ddd66d8f63ddaea97f521c3ecc20da7c976020021500b28ba80c86985e6559411e2d79dc465a8b911d4c180f32303233313232303231343931385a3003020101a036a434303231153013060355040a130c4769744875622c20496e632e31193017060355040313105453412054696d657374616d70696e67',
-    'hex'
+  const tstInfoDER = hexToUint8Array(
+    '3081a602010106092b0601040183bf30023031300d060960864801650304020105000420853ff93762a06ddbf722c4ebe9ddd66d8f63ddaea97f521c3ecc20da7c976020021500b28ba80c86985e6559411e2d79dc465a8b911d4c180f32303233313232303231343931385a3003020101a036a434303231153013060355040a130c4769744875622c20496e632e31193017060355040313105453412054696d657374616d70696e67'
   );
   const asn1 = ASN1Obj.parseBuffer(tstInfoDER);
   const subject = new TSTInfo(asn1);
@@ -51,7 +51,7 @@ describe('TSTInfo', () => {
 
   describe('verify', () => {
     describe('when the messageImprintHashedMessage matches the artifact', () => {
-      const artifact = Buffer.from('hello, world\n');
+      const artifact = stringToUint8Array('hello, world\n');
 
       it('does not throw an error', () => {
         expect(() => subject.verify(artifact)).not.toThrow();
@@ -59,7 +59,7 @@ describe('TSTInfo', () => {
     });
 
     describe('when the messageImprintHashedMessage does NOT match the artifact', () => {
-      const artifact = Buffer.from('oops');
+      const artifact = stringToUint8Array('oops');
 
       it('throws an error', () => {
         expect(() => subject.verify(artifact)).toThrow(

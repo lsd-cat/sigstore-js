@@ -19,20 +19,20 @@ export class ByteStream {
   private static BLOCK_SIZE = 1024;
 
   private buf: ArrayBuffer;
-  private view: Buffer;
+  private view: Uint8Array;
   private start = 0;
 
   constructor(buffer?: ArrayBuffer) {
     if (buffer) {
       this.buf = buffer;
-      this.view = Buffer.from(buffer);
+      this.view = new Uint8Array(buffer);
     } else {
       this.buf = new ArrayBuffer(0);
-      this.view = Buffer.from(this.buf);
+      this.view = new Uint8Array(this.buf);
     }
   }
 
-  get buffer(): Buffer {
+  get buffer(): Uint8Array {
     return this.view.subarray(0, this.start);
   }
 
@@ -50,7 +50,7 @@ export class ByteStream {
 
   // Returns a Buffer containing the specified number of bytes starting at the
   // given start position.
-  public slice(start: number, len: number): Buffer {
+  public slice(start: number, len: number): Uint8Array {
     const end = start + len;
 
     if (end > this.length) {
@@ -95,9 +95,9 @@ export class ByteStream {
     this.start += view.length;
   }
 
-  public getBlock(size: number): Buffer {
+  public getBlock(size: number): Uint8Array {
     if (size <= 0) {
-      return Buffer.alloc(0);
+      return new Uint8Array(0);
     }
 
     if (this.start + size > this.view.length) {
@@ -130,7 +130,7 @@ export class ByteStream {
 
   private realloc(size: number) {
     const newArray = new ArrayBuffer(size);
-    const newView = Buffer.from(newArray);
+    const newView = new Uint8Array(newArray);
 
     // Copy the old buffer into the new one
     newView.set(this.view);

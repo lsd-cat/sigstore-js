@@ -13,10 +13,13 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
+
+import { base64ToUint8Array, uint8ArrayToBase64 } from './encoding';
+
 const PEM_HEADER = /-----BEGIN (.*)-----/;
 const PEM_FOOTER = /-----END (.*)-----/;
 
-export function toDER(certificate: string): Buffer {
+export function toDER(certificate: string): Uint8Array {
   let der = '';
 
   certificate.split('\n').forEach((line) => {
@@ -27,15 +30,15 @@ export function toDER(certificate: string): Buffer {
     der += line;
   });
 
-  return Buffer.from(der, 'base64');
+  return base64ToUint8Array(der);
 }
 
 // Translates a DER-encoded buffer into a PEM-encoded string. Standard PEM
 // encoding dictates that each certificate should have a trailing newline after
 // the footer.
-export function fromDER(certificate: Buffer, type = 'CERTIFICATE'): string {
+export function fromDER(certificate: Uint8Array, type = 'CERTIFICATE'): string {
   // Base64-encode the certificate.
-  const der = certificate.toString('base64');
+  const der = uint8ArrayToBase64(certificate);
   // Split the certificate into lines of 64 characters.
   const lines = der.match(/.{1,64}/g) || '';
 

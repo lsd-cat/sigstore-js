@@ -14,6 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 import { bufferEqual, createPublicKey, hash } from '../crypto';
+import { base64ToUint8Array, stringToUint8Array, uint8ArrayToHex } from '../encoding';
 
 describe('createPublicKey', () => {
   it('should create a public key from a PEM string', () => {
@@ -28,9 +29,8 @@ rkBbmLSGtks4L3qX6yYY0zufBnhC8Ur/iy55GhWP/9A/bY2LhC30M9+RYtw==
   });
 
   it('should create a public key from a DER buffer', () => {
-    const input = Buffer.from(
-      'MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE2G2Y+2tabdTV5BcGiBIx0a9fAFwrkBbmLSGtks4L3qX6yYY0zufBnhC8Ur/iy55GhWP/9A/bY2LhC30M9+RYtw==',
-      'base64'
+    const input = base64ToUint8Array(
+      'MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE2G2Y+2tabdTV5BcGiBIx0a9fAFwrkBbmLSGtks4L3qX6yYY0zufBnhC8Ur/iy55GhWP/9A/bY2LhC30M9+RYtw=='
     );
     const key = createPublicKey(input);
     expect(key).toBeDefined();
@@ -41,9 +41,9 @@ rkBbmLSGtks4L3qX6yYY0zufBnhC8Ur/iy55GhWP/9A/bY2LhC30M9+RYtw==
 
 describe('hash', () => {
   it('returns the SHA256 digest of the blob', () => {
-    const blob = Buffer.from('hello world');
+    const blob = stringToUint8Array('hello world');
     const digest = hash(blob);
-    expect(digest.toString('hex')).toBe(
+    expect(uint8ArrayToHex(digest)).toBe(
       'b94d27b9934d3e08a52e52d7da7dabfac484efe37a5380ee9088f7ace2efcde9'
     );
   });
@@ -51,14 +51,14 @@ describe('hash', () => {
 
 describe('bufferEqual', () => {
   it('returns true when the buffers are equal', () => {
-    const a = Buffer.from('hello world');
-    const b = Buffer.from('hello world');
+    const a = stringToUint8Array('hello world');
+    const b = stringToUint8Array('hello world');
     expect(bufferEqual(a, b)).toBe(true);
   });
 
   it('returns false when the buffers are not equal', () => {
-    const a = Buffer.from('hello world');
-    const b = Buffer.from('hello world!');
+    const a = stringToUint8Array('hello world');
+    const b = stringToUint8Array('hello world!');
     expect(bufferEqual(a, b)).toBe(false);
   });
 });

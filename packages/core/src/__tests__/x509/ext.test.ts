@@ -24,10 +24,11 @@ import {
   X509SubjectKeyIDExtension,
 } from '../../x509/ext';
 import { SignedCertificateTimestamp } from '../../x509/sct';
+import { hexToUint8Array, uint8ArrayToHex } from '../../encoding';
 
 describe('x509Extension', () => {
   describe('constructor', () => {
-    const extension = Buffer.from('300F0603551D130101FF040530030101FF', 'hex');
+    const extension = hexToUint8Array('300F0603551D130101FF040530030101FF');
     const obj = ASN1Obj.parseBuffer(extension);
 
     it('parses the extension', () => {
@@ -38,16 +39,16 @@ describe('x509Extension', () => {
   });
 
   describe('#value', () => {
-    const extension = Buffer.from('300F0603551D130101FF040530030101FF', 'hex');
+    const extension = hexToUint8Array('300F0603551D130101FF040530030101FF');
     const subject = new X509Extension(ASN1Obj.parseBuffer(extension));
 
     it('returns the value', () => {
-      expect(subject.value.toString('hex')).toBe('30030101ff');
+      expect(uint8ArrayToHex(subject.value)).toBe('30030101ff');
     });
   });
 
   describe('#valueObj', () => {
-    const extension = Buffer.from('300F0603551D130101FF040530030101FF', 'hex');
+    const extension = hexToUint8Array('300F0603551D130101FF040530030101FF');
     const subject = new X509Extension(ASN1Obj.parseBuffer(extension));
 
     it('returns the value', () => {
@@ -60,9 +61,8 @@ describe('x509Extension', () => {
 
 describe('x509BasicConstraintsExtension', () => {
   describe('constructor', () => {
-    const basicConstraintsExtension = Buffer.from(
-      '300F0603551D130101FF040530030101FF',
-      'hex'
+    const basicConstraintsExtension = hexToUint8Array(
+      '300F0603551D130101FF040530030101FF'
     );
     const obj = ASN1Obj.parseBuffer(basicConstraintsExtension);
 
@@ -76,9 +76,8 @@ describe('x509BasicConstraintsExtension', () => {
   describe('#isCA', () => {
     describe('when the extension is not a CA', () => {
       // Extension w/ isCA = false
-      const basicConstraintsExtension = Buffer.from(
-        '300F0603551D130101FF04053003010100',
-        'hex'
+      const basicConstraintsExtension = hexToUint8Array(
+        '300F0603551D130101FF04053003010100'
       );
       const subject = new X509BasicConstraintsExtension(
         ASN1Obj.parseBuffer(basicConstraintsExtension)
@@ -91,9 +90,8 @@ describe('x509BasicConstraintsExtension', () => {
 
     describe('when the extension is a CA', () => {
       // Extension w/ isCA = true
-      const basicConstraintsExtension = Buffer.from(
-        '300F0603551D130101FF040530030101FF',
-        'hex'
+      const basicConstraintsExtension = hexToUint8Array(
+        '300F0603551D130101FF040530030101FF'
       );
       const subject = new X509BasicConstraintsExtension(
         ASN1Obj.parseBuffer(basicConstraintsExtension)
@@ -106,9 +104,9 @@ describe('x509BasicConstraintsExtension', () => {
 
     describe('when the extension contains no value for the CA', () => {
       // Extension w/ NO isCA value specified
-      const basicConstraintsExtension = Buffer.from(
-        '300C0603551D130101FF04023000',
-        'hex'
+      const basicConstraintsExtension = hexToUint8Array(
+        '300C0603551D130101FF04023000'
+
       );
       const subject = new X509BasicConstraintsExtension(
         ASN1Obj.parseBuffer(basicConstraintsExtension)
@@ -123,9 +121,8 @@ describe('x509BasicConstraintsExtension', () => {
   describe('#pathLenConstraint', () => {
     describe('when the extension has no pathLenConstraint', () => {
       // Extension w/ isCA = true, no pathLenConstraint
-      const basicConstraintsExtension = Buffer.from(
-        '300F0603551D130101FF040530030101FF',
-        'hex'
+      const basicConstraintsExtension = hexToUint8Array(
+        '300F0603551D130101FF040530030101FF'
       );
       const subject = new X509BasicConstraintsExtension(
         ASN1Obj.parseBuffer(basicConstraintsExtension)
@@ -138,9 +135,8 @@ describe('x509BasicConstraintsExtension', () => {
 
     describe('when the extension has a pathLenConstraint', () => {
       // Extension w/ isCA = true, no pathLenConstraint
-      const basicConstraintsExtension = Buffer.from(
-        '30120603551D130101FF040830060101FF020101',
-        'hex'
+      const basicConstraintsExtension = hexToUint8Array(
+        '30120603551D130101FF040830060101FF020101'
       );
       const subject = new X509BasicConstraintsExtension(
         ASN1Obj.parseBuffer(basicConstraintsExtension)
@@ -155,9 +151,8 @@ describe('x509BasicConstraintsExtension', () => {
 
 describe('x509KeyUsageExtension', () => {
   describe('constructor', () => {
-    const keyUsageExtension = Buffer.from(
-      '300E0603551D0F0101FF040403020780',
-      'hex'
+    const keyUsageExtension = hexToUint8Array(
+      '300E0603551D0F0101FF040403020780'
     );
     const obj = ASN1Obj.parseBuffer(keyUsageExtension);
 
@@ -171,9 +166,8 @@ describe('x509KeyUsageExtension', () => {
   describe('#digitalSignature', () => {
     describe('when the extension has the digitalSignature bit set', () => {
       // Extension w/ digitalSignature bit set
-      const keyUsageExtension = Buffer.from(
-        '300E0603551D0F0101FF040403020780',
-        'hex'
+      const keyUsageExtension = hexToUint8Array(
+        '300E0603551D0F0101FF040403020780'
       );
       const subject = new X509KeyUsageExtension(
         ASN1Obj.parseBuffer(keyUsageExtension)
@@ -186,9 +180,8 @@ describe('x509KeyUsageExtension', () => {
 
     describe('when the extension does not have the digitalSignature bit set', () => {
       // Extension w/ digitalSignature bit unset
-      const keyUsageExtension = Buffer.from(
-        '300E0603551D0F0101FF040403020700',
-        'hex'
+      const keyUsageExtension = hexToUint8Array(
+        '300E0603551D0F0101FF040403020700'
       );
       const subject = new X509KeyUsageExtension(
         ASN1Obj.parseBuffer(keyUsageExtension)
@@ -203,9 +196,8 @@ describe('x509KeyUsageExtension', () => {
   describe('#keyCertSign', () => {
     describe('when the extension has the keyCertSign bit set', () => {
       // Extension w/ keyCertSign bit set
-      const keyUsageExtension = Buffer.from(
-        '300E0603551D0F0101FF040403020204',
-        'hex'
+      const keyUsageExtension = hexToUint8Array(
+        '300E0603551D0F0101FF040403020204'
       );
       const subject = new X509KeyUsageExtension(
         ASN1Obj.parseBuffer(keyUsageExtension)
@@ -218,9 +210,8 @@ describe('x509KeyUsageExtension', () => {
 
     describe('when the extension does not have the keyCertSign bit set', () => {
       // Extension w/ keyCertSign bit unset
-      const keyUsageExtension = Buffer.from(
-        '300E0603551D0F0101FF040403020200',
-        'hex'
+      const keyUsageExtension = hexToUint8Array(
+        '300E0603551D0F0101FF040403020200'
       );
       const subject = new X509KeyUsageExtension(
         ASN1Obj.parseBuffer(keyUsageExtension)
@@ -235,9 +226,8 @@ describe('x509KeyUsageExtension', () => {
   describe('#crlSign', () => {
     describe('when the extension has the cRLSign bit set', () => {
       // Extension w/ cRLSign bit set
-      const keyUsageExtension = Buffer.from(
-        '300E0603551D0F0101FF040403020102',
-        'hex'
+      const keyUsageExtension = hexToUint8Array(
+        '300E0603551D0F0101FF040403020102'
       );
       const subject = new X509KeyUsageExtension(
         ASN1Obj.parseBuffer(keyUsageExtension)
@@ -250,9 +240,8 @@ describe('x509KeyUsageExtension', () => {
 
     describe('when the extension does not have the cRLSign bit set', () => {
       // Extension w/ cRLSign bit unset
-      const keyUsageExtension = Buffer.from(
-        '300E0603551D0F0101FF040403020100',
-        'hex'
+      const keyUsageExtension = hexToUint8Array(
+        '300E0603551D0F0101FF040403020100'
       );
       const subject = new X509KeyUsageExtension(
         ASN1Obj.parseBuffer(keyUsageExtension)
@@ -267,9 +256,8 @@ describe('x509KeyUsageExtension', () => {
 
 describe('x509SubjectAlternativeNameExtension', () => {
   describe('constructor', () => {
-    const subjectAltNameExtension = Buffer.from(
-      '301F0603551D110101FF041530138111627269616E40646568616D65722E636F6D',
-      'hex'
+    const subjectAltNameExtension = hexToUint8Array(
+      '301F0603551D110101FF041530138111627269616E40646568616D65722E636F6D'
     );
     const obj = ASN1Obj.parseBuffer(subjectAltNameExtension);
 
@@ -283,9 +271,8 @@ describe('x509SubjectAlternativeNameExtension', () => {
   describe('#rfc822Name', () => {
     describe('when the extension has an rfc822Name', () => {
       // Extension w/ rfc822Name
-      const subjectAltNameExtension = Buffer.from(
-        '30190603551D110101FF040F300D810B666F6F406261722E636F6D',
-        'hex'
+      const subjectAltNameExtension = hexToUint8Array(
+        '30190603551D110101FF040F300D810B666F6F406261722E636F6D'
       );
       const subject = new X509SubjectAlternativeNameExtension(
         ASN1Obj.parseBuffer(subjectAltNameExtension)
@@ -298,9 +285,8 @@ describe('x509SubjectAlternativeNameExtension', () => {
 
     describe('when the extension has a uri', () => {
       // Extension w/ uri
-      const subjectAltNameExtension = Buffer.from(
-        '30190603551D110101FF040F300D860B666F6F406261722E636F6D',
-        'hex'
+      const subjectAltNameExtension = hexToUint8Array(
+        '30190603551D110101FF040F300D860B666F6F406261722E636F6D'
       );
       const subject = new X509SubjectAlternativeNameExtension(
         ASN1Obj.parseBuffer(subjectAltNameExtension)
@@ -315,9 +301,8 @@ describe('x509SubjectAlternativeNameExtension', () => {
   describe('#uri', () => {
     describe('when the extension has a uri', () => {
       // Extension w/ uri
-      const subjectAltNameExtension = Buffer.from(
-        '30190603551D110101FF040F300D860B666F6F406261722E636F6D',
-        'hex'
+      const subjectAltNameExtension = hexToUint8Array(
+        '30190603551D110101FF040F300D860B666F6F406261722E636F6D'
       );
       const subject = new X509SubjectAlternativeNameExtension(
         ASN1Obj.parseBuffer(subjectAltNameExtension)
@@ -330,9 +315,8 @@ describe('x509SubjectAlternativeNameExtension', () => {
 
     describe('when the extension has an rfc822Name', () => {
       // Extension w/ rfc822Name
-      const subjectAltNameExtension = Buffer.from(
-        '30190603551D110101FF040F300D810B666F6F406261722E636F6D',
-        'hex'
+      const subjectAltNameExtension = hexToUint8Array(
+        '30190603551D110101FF040F300D810B666F6F406261722E636F6D'
       );
       const subject = new X509SubjectAlternativeNameExtension(
         ASN1Obj.parseBuffer(subjectAltNameExtension)
@@ -347,9 +331,8 @@ describe('x509SubjectAlternativeNameExtension', () => {
   describe('#otherName', () => {
     describe('when the extension has an otherName', () => {
       // Extension w/ othername
-      const subjectAltNameExtension = Buffer.from(
-        '30260603551D11041F301DA01B060A2B0601040183BF300107A00D0C0B666F6F406261722E636F6D',
-        'hex'
+      const subjectAltNameExtension = hexToUint8Array(
+        '30260603551D11041F301DA01B060A2B0601040183BF300107A00D0C0B666F6F406261722E636F6D'
       );
       const subject = new X509SubjectAlternativeNameExtension(
         ASN1Obj.parseBuffer(subjectAltNameExtension)
@@ -362,9 +345,8 @@ describe('x509SubjectAlternativeNameExtension', () => {
 
     describe('when the incorrect otherName OID is specified', () => {
       // Extension w/ othername
-      const subjectAltNameExtension = Buffer.from(
-        '30260603551D11041F301DA01B060A2B0601040183BF300107A00D0C0B666F6F406261722E636F6D',
-        'hex'
+      const subjectAltNameExtension = hexToUint8Array(
+        '30260603551D11041F301DA01B060A2B0601040183BF300107A00D0C0B666F6F406261722E636F6D'
       );
       const subject = new X509SubjectAlternativeNameExtension(
         ASN1Obj.parseBuffer(subjectAltNameExtension)
@@ -377,9 +359,8 @@ describe('x509SubjectAlternativeNameExtension', () => {
 
     describe('when the extension has an rfc822Name', () => {
       // Extension w/ rfc822Name
-      const subjectAltNameExtension = Buffer.from(
-        '30190603551D110101FF040F300D810B666F6F406261722E636F6D',
-        'hex'
+      const subjectAltNameExtension = hexToUint8Array(
+        '30190603551D110101FF040F300D810B666F6F406261722E636F6D'
       );
       const subject = new X509SubjectAlternativeNameExtension(
         ASN1Obj.parseBuffer(subjectAltNameExtension)
@@ -394,9 +375,8 @@ describe('x509SubjectAlternativeNameExtension', () => {
 
 describe('x509AuthorityKeyIDExtension', () => {
   describe('constructor', () => {
-    const akiExtension = Buffer.from(
-      '301F0603551D23041830168014875197D46B0D39CC9C44DFEDD1FBF77BF04F9B4F',
-      'hex'
+    const akiExtension = hexToUint8Array(
+      '301F0603551D23041830168014875197D46B0D39CC9C44DFEDD1FBF77BF04F9B4F'
     );
     const obj = ASN1Obj.parseBuffer(akiExtension);
 
@@ -410,9 +390,8 @@ describe('x509AuthorityKeyIDExtension', () => {
   describe('#keyIdentifier', () => {
     describe('when the extension has a keyIdentifier', () => {
       // Extension w/ keyIdentifier
-      const akiExtension = Buffer.from(
-        '301F0603551D23041830168014875197D46B0D39CC9C44DFEDD1FBF77BF04F9B4F',
-        'hex'
+      const akiExtension = hexToUint8Array(
+        '301F0603551D23041830168014875197D46B0D39CC9C44DFEDD1FBF77BF04F9B4F'
       );
       const subject = new X509AuthorityKeyIDExtension(
         ASN1Obj.parseBuffer(akiExtension)
@@ -420,16 +399,15 @@ describe('x509AuthorityKeyIDExtension', () => {
 
       it('returns the keyIdentifier', () => {
         expect(subject.keyIdentifier).toEqual(
-          Buffer.from('875197D46B0D39CC9C44DFEDD1FBF77BF04F9B4F', 'hex')
+          hexToUint8Array('875197D46B0D39CC9C44DFEDD1FBF77BF04F9B4F')
         );
       });
     });
 
     describe('when the extension has NO keyIdentifier', () => {
       // Extension w/o keyIdentifier (bad context-specific tag)
-      const akiExtension = Buffer.from(
-        '301F0603551D23041830168114875197D46B0D39CC9C44DFEDD1FBF77BF04F9B4F',
-        'hex'
+      const akiExtension = hexToUint8Array(
+        '301F0603551D23041830168114875197D46B0D39CC9C44DFEDD1FBF77BF04F9B4F'
       );
       const subject = new X509AuthorityKeyIDExtension(
         ASN1Obj.parseBuffer(akiExtension)
@@ -444,9 +422,8 @@ describe('x509AuthorityKeyIDExtension', () => {
 
 describe('x509SubjectKeyIDExtension', () => {
   describe('constructor', () => {
-    const skiExtension = Buffer.from(
-      '301D0603551D0E04160414BC8EE9246141781B89DB3CAB61A94F825A34C5A8',
-      'hex'
+    const skiExtension = hexToUint8Array(
+      '301D0603551D0E04160414BC8EE9246141781B89DB3CAB61A94F825A34C5A8'
     );
     const obj = ASN1Obj.parseBuffer(skiExtension);
 
@@ -458,9 +435,8 @@ describe('x509SubjectKeyIDExtension', () => {
   });
 
   describe('#keyIdentifier', () => {
-    const skiExtension = Buffer.from(
-      '301D0603551D0E04160414BC8EE9246141781B89DB3CAB61A94F825A34C5A8',
-      'hex'
+    const skiExtension = hexToUint8Array(
+      '301D0603551D0E04160414BC8EE9246141781B89DB3CAB61A94F825A34C5A8'
     );
 
     const subject = new X509SubjectKeyIDExtension(
@@ -469,7 +445,7 @@ describe('x509SubjectKeyIDExtension', () => {
 
     it('returns the keyIdentifier', () => {
       expect(subject.keyIdentifier).toEqual(
-        Buffer.from('BC8EE9246141781B89DB3CAB61A94F825A34C5A8', 'hex')
+        hexToUint8Array('BC8EE9246141781B89DB3CAB61A94F825A34C5A8')
       );
     });
   });
@@ -477,9 +453,8 @@ describe('x509SubjectKeyIDExtension', () => {
 
 describe('x509SCTExtension', () => {
   describe('constructor', () => {
-    const sctExtension = Buffer.from(
-      '3012060A2B06010401D679020402040404020000',
-      'hex'
+    const sctExtension = hexToUint8Array(
+      '3012060A2B06010401D679020402040404020000'
     );
     const obj = ASN1Obj.parseBuffer(sctExtension);
 
@@ -493,9 +468,8 @@ describe('x509SCTExtension', () => {
   describe('#signedCertificateTimestamps', () => {
     describe('when there are no SCTs in the extension', () => {
       // Extension w/ zero-length array of SCTs
-      const sctExtension = Buffer.from(
-        '3012060A2B06010401D679020402040404020000',
-        'hex'
+      const sctExtension = hexToUint8Array(
+        '3012060A2B06010401D679020402040404020000'
       );
       const subject = new X509SCTExtension(ASN1Obj.parseBuffer(sctExtension));
 
@@ -507,9 +481,8 @@ describe('x509SCTExtension', () => {
     });
 
     describe('when there are SCTs in the extension', () => {
-      const sctExtension = Buffer.from(
-        '3043060A2B06010401D679020402043504330031002F0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000',
-        'hex'
+      const sctExtension = hexToUint8Array(
+        '3043060A2B06010401D679020402043504330031002F0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000'
       );
       const subject = new X509SCTExtension(ASN1Obj.parseBuffer(sctExtension));
 
@@ -523,10 +496,9 @@ describe('x509SCTExtension', () => {
 
     describe('when the stated length of the SCT list does not match the data ', () => {
       // Extension where length of SCT list is mismatched with the length of the constituent SCTs
-      const sctExtension = Buffer.from(
+      const sctExtension = hexToUint8Array(
         //                                   |--| Should be 0x0031 for a valid SCT extension
-        '3043060A2B06010401D67902040204350433002F002F0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000',
-        'hex'
+        '3043060A2B06010401D67902040204350433002F002F0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000'
       );
       const subject = new X509SCTExtension(ASN1Obj.parseBuffer(sctExtension));
 

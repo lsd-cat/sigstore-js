@@ -15,25 +15,26 @@ limitations under the License.
 */
 import * as crypto from '../crypto';
 import { ByteStream } from '../stream';
+import { readBigInt64BE } from '../encoding';
 
 interface SCTOptions {
   version: number;
-  logID: Buffer;
-  timestamp: Buffer;
-  extensions: Buffer;
+  logID: Uint8Array;
+  timestamp: Uint8Array;
+  extensions: Uint8Array;
   hashAlgorithm: number;
   signatureAlgorithm: number;
-  signature: Buffer;
+  signature: Uint8Array;
 }
 
 export class SignedCertificateTimestamp {
   readonly version: number;
-  readonly logID: Buffer;
-  readonly timestamp: Buffer;
-  readonly extensions: Buffer;
+  readonly logID: Uint8Array;
+  readonly timestamp: Uint8Array;
+  readonly extensions: Uint8Array;
   readonly hashAlgorithm: number;
   readonly signatureAlgorithm: number;
-  readonly signature: Buffer;
+  readonly signature: Uint8Array;
 
   constructor(options: SCTOptions) {
     this.version = options.version;
@@ -46,7 +47,7 @@ export class SignedCertificateTimestamp {
   }
 
   get datetime(): Date {
-    return new Date(Number(this.timestamp.readBigInt64BE()));
+    return new Date(Number(readBigInt64BE(this.timestamp)));
   }
 
   // Returns the hash algorithm used to generate the SCT's signature.
@@ -79,7 +80,7 @@ export class SignedCertificateTimestamp {
     }
   }
 
-  public verify(preCert: Buffer, key: crypto.KeyObject): boolean {
+  public verify(preCert: Uint8Array, key: crypto.KeyObject): boolean {
     // Assemble the digitally-signed struct (the data over which the signature
     // was generated).
     // https://www.rfc-editor.org/rfc/rfc6962#section-3.2
@@ -104,7 +105,7 @@ export class SignedCertificateTimestamp {
   // specified as part of the SCT and TLS specs.
   // https://www.rfc-editor.org/rfc/rfc6962#section-3.2
   // https://www.rfc-editor.org/rfc/rfc5246#section-7.4.1.4.1
-  public static parse(buf: Buffer): SignedCertificateTimestamp {
+  public static parse(buf: Uint8Array): SignedCertificateTimestamp {
     const stream = new ByteStream(buf);
 
     // Version - enum { v1(0), (255) }

@@ -14,6 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 import { fromDER, toDER } from '../pem';
+import { base64ToUint8Array } from '../encoding';
 
 describe('toDER', () => {
   describe('when the object is a certificate', () => {
@@ -21,7 +22,7 @@ describe('toDER', () => {
       '-----BEGIN CERTIFICATE-----\nABCD\n-----END CERTIFICATE-----\n';
     it('returns a DER-encoded certificate', () => {
       const der = toDER(pem);
-      expect(der).toEqual(Buffer.from('ABCD', 'base64'));
+      expect(der).toEqual(base64ToUint8Array('ABCD'));
     });
   });
 
@@ -29,7 +30,7 @@ describe('toDER', () => {
     const pem = '-----BEGIN PUBLIC KEY-----\nDEFG\n-----END PUBLIC KEY-----\n';
     it('returns a DER-encoded key', () => {
       const der = toDER(pem);
-      expect(der).toEqual(Buffer.from('DEFG', 'base64'));
+      expect(der).toEqual(base64ToUint8Array('DEFG'));
     });
   });
 });
@@ -49,7 +50,7 @@ describe('fromDER', () => {
 
   describe('when an empty buffer is provided', () => {
     it('returns just the PEM headers', () => {
-      const pem = fromDER(Buffer.from(''));
+      const pem = fromDER(base64ToUint8Array(''));
       expect(pem).toEqual(
         '-----BEGIN CERTIFICATE-----\n-----END CERTIFICATE-----\n'
       );

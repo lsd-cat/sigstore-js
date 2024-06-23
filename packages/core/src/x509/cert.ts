@@ -41,7 +41,7 @@ export class X509Certificate {
     this.root = asn1;
   }
 
-  public static parse(cert: Buffer | string): X509Certificate {
+  public static parse(cert: Uint8Array | string): X509Certificate {
     const der = typeof cert === 'string' ? pem.toDER(cert) : cert;
     const asn1 = ASN1Obj.parseBuffer(der);
     return new X509Certificate(asn1);
@@ -57,7 +57,7 @@ export class X509Certificate {
     return `v${(ver + BigInt(1)).toString()}`;
   }
 
-  get serialNumber(): Buffer {
+  get serialNumber(): Uint8Array {
     return this.serialNumberObj.value;
   }
 
@@ -71,15 +71,15 @@ export class X509Certificate {
     return this.validityObj.subs[1].toDate();
   }
 
-  get issuer(): Buffer {
+  get issuer(): Uint8Array {
     return this.issuerObj.value;
   }
 
-  get subject(): Buffer {
+  get subject(): Uint8Array {
     return this.subjectObj.value;
   }
 
-  get publicKey(): Buffer {
+  get publicKey(): Uint8Array {
     return this.subjectPublicKeyInfoObj.toDER();
   }
 
@@ -88,7 +88,7 @@ export class X509Certificate {
     return ECDSA_SIGNATURE_ALGOS[oid];
   }
 
-  get signatureValue(): Buffer {
+  get signatureValue(): Uint8Array {
     // Signature value is a bit string, so we need to skip the first byte
     return this.signatureValueObj.value.subarray(1);
   }
@@ -171,14 +171,13 @@ export class X509Certificate {
   }
 
   public equals(other: X509Certificate): boolean {
-    return this.root.toDER().equals(other.root.toDER());
+    return crypto.bufferEqual(this.root.toDER(), other.root.toDER());
   }
 
   // Creates a copy of the certificate with a new buffer
   public clone(): X509Certificate {
     const der = this.root.toDER();
-    const clone = Buffer.alloc(der.length);
-    der.copy(clone);
+    const clone = new Uint8Array(der);
     return X509Certificate.parse(clone);
   }
 

@@ -38,15 +38,15 @@ export class TSTInfo {
     return SHA2_HASH_ALGOS[oid];
   }
 
-  get messageImprintHashedMessage(): Buffer {
+  get messageImprintHashedMessage(): Uint8Array {
     return this.messageImprintObj.subs[1].value;
   }
 
-  get raw(): Buffer {
+  get raw(): Uint8Array {
     return this.root.toDER();
   }
 
-  public verify(data: Buffer): void {
+  public verify(data: Uint8Array): void {
     const digest = crypto.digest(this.messageImprintHashAlgorithm, data);
     if (!crypto.bufferEqual(digest, this.messageImprintHashedMessage)) {
       throw new RFC3161TimestampVerificationError(
